@@ -1,11 +1,11 @@
 package ru.job4j.dream.store;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import ru.job4j.dream.WrongTypeException;
 import ru.job4j.dream.model.Candidate;
 import ru.job4j.dream.model.Model;
 import ru.job4j.dream.model.Post;
 
+import java.util.logging.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.sql.Connection;
@@ -20,6 +20,7 @@ import java.util.Properties;
 public class PsqlStore implements Store {
 
     private final BasicDataSource pool = new BasicDataSource();
+    private static final Logger LOGGER = Logger.getLogger(PsqlStore.class.getName());
 
     private PsqlStore() {
         Properties cfg = new Properties();
@@ -28,12 +29,12 @@ public class PsqlStore implements Store {
         )) {
             cfg.load(io);
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            LOGGER.log(Level.WARNING, "Error! IllegalStateException!", e);
         }
         try {
             Class.forName(cfg.getProperty("jdbc.driver"));
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            LOGGER.log(Level.WARNING, "Error! IllegalStateException!", e);
         }
         pool.setDriverClassName(cfg.getProperty("jdbc.driver"));
         pool.setUrl(cfg.getProperty("jdbc.url"));
@@ -64,7 +65,7 @@ public class PsqlStore implements Store {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
         }
         return posts;
     }
@@ -81,7 +82,7 @@ public class PsqlStore implements Store {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
         }
         return candidates;
     }
@@ -95,47 +96,33 @@ public class PsqlStore implements Store {
     }
 
     private Model create(Model model) {
-        try (Connection cn = pool.getConnection()) {
-            var ps = cn.prepareStatement("INSERT INTO post(name) VALUES (?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            try {
-                if (model instanceof Candidate) {
-                    ps = cn.prepareStatement("INSERT INTO candidate(name) VALUES (?)", PreparedStatement.RETURN_GENERATED_KEYS);
-                } else if (!(model instanceof Post)) {
-                    throw new WrongTypeException("Error! Wrong instance type!");
+        final String tableName = model.getClass().getSimpleName().toLowerCase();
+        try (Connection cn = pool.getConnection();
+             PreparedStatement ps = cn.prepareStatement("INSERT INTO " + tableName + "(name) VALUES (?)", PreparedStatement.RETURN_GENERATED_KEYS)
+        ) {
+            ps.setString(1, model.getName());
+            ps.execute();
+            try (ResultSet id = ps.getGeneratedKeys()) {
+                if (id.next()) {
+                    model.setId(id.getInt(1));
                 }
-                ps.setString(1, model.getName());
-                ps.execute();
-                try (ResultSet id = ps.getGeneratedKeys()) {
-                    if (id.next()) {
-                        model.setId(id.getInt(1));
-                    }
-                }
-            } finally {
-                ps.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
         }
         return model;
     }
 
     private void update(Model model) {
-        try (Connection cn = pool.getConnection()) {
-            var ps = cn.prepareStatement("UPDATE post SET name=? WHERE id=?");
-            try {
-                if (model instanceof Candidate) {
-                    ps = cn.prepareStatement("UPDATE candidate SET name=? WHERE id=?");
-                } else if (!(model instanceof Post)) {
-                    throw new WrongTypeException("Error! Wrong instance type!");
-                }
-                ps.setString(1, model.getName());
-                ps.setInt(2, model.getId());
-                ps.execute();
-            } finally {
-                ps.close();
-            }
+        final String tableName = model.getClass().getSimpleName().toLowerCase();
+        try (Connection cn = pool.getConnection();
+             PreparedStatement ps = cn.prepareStatement("UPDATE " + tableName + " SET name=? WHERE id=?")
+        ) {
+            ps.setString(1, model.getName());
+            ps.setInt(2, model.getId());
+            ps.execute();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
         }
     }
 
@@ -147,14 +134,37 @@ public class PsqlStore implements Store {
         ) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
+                if (rs.next()) {
                     resultPost.setId(rs.getInt("id"));
                     resultPost.setName(rs.getString("name"));
+                } else {
+                    LOGGER.warning("Error! Can't find data in storage");
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        }
+        return resultPost;
+    }
+
+    @Override
+    public Candidate findCandidateById(int id) {
+        Candidate result = new Candidate(0, "");
+        try (Connection cn = pool.getConnection();
+             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate WHERE id=?")
+        ) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    result.setId(rs.getInt("id"));
+                    result.setName(rs.getString("name"));
+                } else {
+                    LOGGER.warning("Error! Can't find data in storage");
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
         }
-        return resultPost;
+        return result;
     }
 }

@@ -14,4 +14,6 @@ public interface Store {
     void save(Model model);
 
     Post findById(int id);
+
+    Candidate findCandidateById(int id);
 }

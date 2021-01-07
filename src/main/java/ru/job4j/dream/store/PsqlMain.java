@@ -21,20 +21,19 @@ public class PsqlMain {
         System.out.println("Name = " + store.findById(1).getName());
         System.out.println();
         System.out.println("Test function update for Post:");
-        store.save(new Post(1, "Test Job"));
+        store.save(new Post(1, "Scala Job"));
         System.out.println("Id = " + store.findById(1).getId());
         System.out.println("Name = " + store.findById(1).getName());
         System.out.println();
         System.out.println("Test function findAllCandidates");
-        store.save(new Candidate(0, "Ben"));
+        store.save(new Candidate(0, "Mike"));
         for (Candidate candidate : store.findAllCandidates()) {
             System.out.println(candidate.getId() + " " + candidate.getName());
         }
         System.out.println();
         System.out.println("Test function update for Candidates:");
-        store.save(new Candidate(1, "Sem"));
-        for (Candidate candidate : store.findAllCandidates()) {
-            System.out.println(candidate.getId() + " " + candidate.getName());
-        }
+        store.save(new Candidate(1, "Donald"));
+        System.out.println("Id = " + store.findCandidateById(1).getId());
+        System.out.println("Name = " + store.findCandidateById(1).getName());
     }
 }
