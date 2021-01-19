@@ -38,25 +38,48 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th scope="col">Названия</th>
+                        <!--<th scope="col">Названия</th>-->
+                        <th>Названия</th>
+                        <th>Download</th>
+                        <th>View</th>
+                        <!--<th scope="col">View</th>-->
                     </tr>
                     </thead>
                     <tbody>
+                    <%--<c:forEach items="${candidates}" var="can">--%>
                     <c:forEach items="${candidates}" var="can">
                         <tr>
-                            <td>
+                            <td >
                                 <a href='<c:url value="/candidate/edit.jsp?id=${can.id}"/>'>
-                                    <i class="fa fa-edit mr-3"></i>
+                                    <!--<i class="fa fa-edit mr-3"></i>-->
+                                    <i class="fa fa-edit fa-lg">&nbsp;&nbsp;&nbsp;</i>
                                 </a>
+                                <!--<p> </p>-->
                                 <c:out value="${can.name}"/>
                             </td>
-                        </tr>
-                    </c:forEach>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                            <td>
+                        <%--<a href="<c:url value='/download?name=${images.get(0)}'/>">--%>
+                        <%--<a href="<c:url value='/download?name=${images}'/>">
+                        <a href="<c:url value='/download?name=${images[1]}'/>">
+                        <a href="<c:url value='/download?name=${images[1.index]}'/>">
+                        <a href="<c:url value='/download?name=${images[0]}'/>">
+                        <a href="<c:url value='/download?name=${candidates[0]}'/>">--%>
+                        <a href="<c:url value='/download?name=${can.name}'/>">
+                            <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>
+                            <!--<span class="sr-only"></span>-->
+                        </a>
+                    </td>
+                    <td>
+                        <%--<img src="<c:url value='/download?name=${image}'/>"  width="30px" height="30"/>--%>
+                        <img src="<c:url value='/download?name=${can.photoId}'/>"  width="30px" height="30"/>
+                    </td>
+                </tr>
+            </c:forEach>
+            </tbody>
+        </table>
     </div>
+</div>
+</div>
 </div>
 </body>
 </html>

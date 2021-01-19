@@ -2,16 +2,16 @@ package ru.job4j.dream.model;
 
 import java.util.Objects;
 
-public class Candidate implements Model {
+public class Photo implements Model {
     private int id;
     private String name;
-    private String photoId;
 
-    public Candidate(int id, String name) {
+    public Photo(int id, String name) {
         this.id = id;
         this.name = name;
     }
 
+    @Override
     public int getId() {
         return id;
     }
@@ -32,9 +32,8 @@ public class Candidate implements Model {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Candidate candidate = (Candidate) o;
-        return id == candidate.id &&
-                Objects.equals(name, candidate.name);
+        Photo photo = (Photo) o;
+        return id == photo.id && name.equals(photo.name);
     }
 
     @Override
