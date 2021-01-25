@@ -71,7 +71,7 @@
                     </td>
                     <td>
                         <%--<img src="<c:url value='/download?name=${image}'/>"  width="30px" height="30"/>--%>
-                        <img src="<c:url value='/download?name=${can.photoId}'/>"  width="30px" height="30"/>
+                        <img src="<c:url value='/download?name=${can.photo}'/>"  width="30px" height="30"/>
                     </td>
                 </tr>
             </c:forEach>

@@ -78,7 +78,8 @@ public class PsqlStore implements Store {
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {
-                    candidates.add(new Candidate(it.getInt("id"), it.getString("name")));
+                    //candidates.add(new Candidate(it.getInt("id"), it.getString("name")));zebra.jpeg
+                    candidates.add(new Candidate(it.getInt("id"), it.getString("name"),"zebra.jpeg"));
                 }
             }
         } catch (Exception e) {
@@ -149,7 +150,7 @@ public class PsqlStore implements Store {
 
     @Override
     public Candidate findCandidateById(int id) {
-        Candidate result = new Candidate(0, "");
+        Candidate result = new Candidate(0, "", "TestPhoto");
         try (Connection cn = pool.getConnection();
              PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate WHERE id=?")
         ) {
