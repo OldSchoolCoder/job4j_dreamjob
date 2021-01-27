@@ -74,12 +74,17 @@ public class PsqlStore implements Store {
     public Collection<Candidate> findAllCandidates() {
         List<Candidate> candidates = new ArrayList<>();
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate")
+             //PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate")
+             //PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate INNER JOIN photo ON id=id")
+             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate INNER JOIN photo ON candidate.id=photo.id")
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {
                     //candidates.add(new Candidate(it.getInt("id"), it.getString("name")));zebra.jpeg
-                    candidates.add(new Candidate(it.getInt("id"), it.getString("name"),"zebra.jpeg"));
+                    //candidates.add(new Candidate(it.getInt("id"), it.getString("name"),"zebra.jpeg"));
+                    //candidates.add(new Candidate(it.getInt("candidate.id"), it.getString("candidate.name"),"zebra.jpeg"));
+                    //candidates.add(new Candidate(it.getInt(1), it.getString(2),"zebra.jpeg"));
+                    candidates.add(new Candidate(it.getInt(1), it.getString(2),it.getString(4)));
                 }
             }
         } catch (Exception e) {
