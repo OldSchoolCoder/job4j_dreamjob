@@ -39,12 +39,18 @@ public class UploadServlet extends HttpServlet {
         factory.setRepository(repository);
         ServletFileUpload upload = new ServletFileUpload(factory);
         try {
+            //Получаем список всех данных в запросе
             List<FileItem> items = upload.parseRequest(req);
-            File folder = new File("images");
+            //File folder = new File("images");
+            //FileNotFoundException: images/photo (Is a directory) - если не нажать кнопку загрузки, то в любом случае так будет
+            File folder = new File("images//photo");
+            //работает.
+            //File folder = new File("images//test");
             if (!folder.exists()) {
                 folder.mkdir();
             }
             for (FileItem item : items) {
+                //Если элемент не поле, то это файл и из него можно прочитать весь входной поток и записать его в файл или напрямую в базу данных.
                 if (!item.isFormField()) {
                     File file = new File(folder + File.separator + item.getName());
                     try (FileOutputStream out = new FileOutputStream(file)) {

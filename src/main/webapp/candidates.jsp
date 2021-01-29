@@ -63,8 +63,9 @@
                         <a href="<c:url value='/download?name=${images[1]}'/>">
                         <a href="<c:url value='/download?name=${images[1.index]}'/>">
                         <a href="<c:url value='/download?name=${images[0]}'/>">
-                        <a href="<c:url value='/download?name=${candidates[0]}'/>">--%>
-                        <a href="<c:url value='/download?name=${can.name}'/>">
+                        <a href="<c:url value='/download?name=${candidates[0]}'/>">
+                        <a href="<c:url value='/download?name=${can.name}'/>">--%>
+                        <a href="<c:url value='/download?name=${can.photo}'/>">
                             <i class="fa fa-refresh fa-spin fa-lg fa-fw"></i>
                             <!--<span class="sr-only"></span>-->
                         </a>
