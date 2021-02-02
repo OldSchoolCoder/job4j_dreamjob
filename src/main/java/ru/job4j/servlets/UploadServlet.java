@@ -23,7 +23,9 @@ public class UploadServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<String> images = new ArrayList<>();
-        for (File name : new File("images").listFiles()) {
+        //читаем имена файлов в директории images//photo
+        for (File name : new File("images//photo").listFiles()) {
+            //В этом списке содержатся только имена
             images.add(name.getName());
         }
         req.setAttribute("images", images);

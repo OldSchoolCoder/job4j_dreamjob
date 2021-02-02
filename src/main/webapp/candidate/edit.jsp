@@ -31,9 +31,10 @@
                 <% } %>
             </div>
             <div class="card-body">
-                <form action="<%=request.getContextPath()%>/candidates.do?id=<%=candidate.getId()%>" method="post">
+                <form action="<%=request.getContextPath()%>/candidates.do" enctype="multipart/form-data" method="post">
                     <div class="mb-3">
                         <label class="form-label">Name</label>
+                        <input type="hidden" name="id" value="<%=candidate.getId()%>">
                         <input type="text" name="name" value="<%=candidate.getName()%>" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
                         <div id="emailHelp" class="form-text">We'll never share your name with anyone else</div>
                     </div>
