@@ -20,25 +20,18 @@ public class DeleteServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        //int id = Integer.parseInt(req.getParameter("id"));
-        //int id = Integer.valueOf(req.getParameter("id"));
         String id = req.getParameter("id");
         Candidate candidate = new Candidate(0, "", "TestPhoto");
         if (id != null) {
             candidate = PsqlStore.instOf().findCandidateById(Integer.valueOf(id));
         }
-        LOGGER.log(Level.WARNING, "Parameter id = {0}", id);
-        //Files.delete(Path.of("images//photo"+ File.separator + name));
-        LOGGER.log(Level.WARNING,"Hello from DeleteServlet! Candidate name = {0}", candidate.getName());
-        LOGGER.log(Level.WARNING,"Candidate photo = {0}", candidate.getPhoto());
-        //Candidate candidate = PsqlStore.instOf().findCandidateById(999);
-        //Candidate candidate = PsqlStore.instOf().findCandidateById(999);
         if (candidate.getName().equals("")) {
             LOGGER.warning("Error! Can't find candidate in storage");
         } else {
             PsqlStore.instOf().delete(candidate);
-            Files.delete(Path.of("images//photo"+ File.separator + candidate.getPhoto()));
+            Files.delete(Path.of("images//photo" + File.separator + candidate.getPhoto()));
         }
-
+        req.setAttribute("candidates", PsqlStore.instOf().findAllCandidates());
+        req.getRequestDispatcher("candidates.jsp").forward(req, resp);
     }
 }

@@ -74,19 +74,11 @@ public class PsqlStore implements Store {
     public Collection<Candidate> findAllCandidates() {
         List<Candidate> candidates = new ArrayList<>();
         try (Connection cn = pool.getConnection();
-             //PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate")
-             //PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate INNER JOIN photo ON id=id")
-             //PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate INNER JOIN photo ON candidate.id=photo.id")
-             //выводим кандидаов даже без фото - ошибок не было
              PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id")
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {
-                    //candidates.add(new Candidate(it.getInt("id"), it.getString("name")));zebra.jpeg
-                    //candidates.add(new Candidate(it.getInt("id"), it.getString("name"),"zebra.jpeg"));
-                    //candidates.add(new Candidate(it.getInt("candidate.id"), it.getString("candidate.name"),"zebra.jpeg"));
-                    //candidates.add(new Candidate(it.getInt(1), it.getString(2),"zebra.jpeg"));
-                    candidates.add(new Candidate(it.getInt(1), it.getString(2),it.getString(4)));
+                    candidates.add(new Candidate(it.getInt(1), it.getString(2), it.getString(4)));
                 }
             }
         } catch (Exception e) {
@@ -159,8 +151,6 @@ public class PsqlStore implements Store {
     public Candidate findCandidateById(int id) {
         Candidate result = new Candidate(0, "", "TestPhoto");
         try (Connection cn = pool.getConnection();
-             //PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate WHERE id=?")
-             //PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id")
              PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id where candidate.id=?")
         ) {
             ps.setInt(1, id);
@@ -181,9 +171,7 @@ public class PsqlStore implements Store {
 
     @Override
     public void delete(Model model) {
-        //final String tableName = model.getClass().getSimpleName().toLowerCase();
         try (Connection cn = pool.getConnection();
-             //PreparedStatement ps = cn.prepareStatement("DELETE FROM " + tableName + " WHERE id=?")
              PreparedStatement ps = cn.prepareStatement("DELETE FROM candidate where id=?; DELETE FROM photo where id=?")
         ) {
             ps.setInt(1, model.getId());

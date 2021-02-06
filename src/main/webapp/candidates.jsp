@@ -4,7 +4,6 @@
 <%@ page import="java.util.Collection" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
-
 <!doctype html>
 <html lang="en">
 

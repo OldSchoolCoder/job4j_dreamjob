@@ -23,9 +23,7 @@ public class UploadServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<String> images = new ArrayList<>();
-        //читаем имена файлов в директории images//photo
         for (File name : new File("images//photo").listFiles()) {
-            //В этом списке содержатся только имена
             images.add(name.getName());
         }
         req.setAttribute("images", images);
@@ -41,27 +39,18 @@ public class UploadServlet extends HttpServlet {
         factory.setRepository(repository);
         ServletFileUpload upload = new ServletFileUpload(factory);
         try {
-            //Получаем список всех данных в запросе
             List<FileItem> items = upload.parseRequest(req);
-            //File folder = new File("images");
-            //FileNotFoundException: images/photo (Is a directory) - если не нажать кнопку загрузки, то в любом случае так будет
             File folder = new File("images//photo");
-            //работает.
-            //File folder = new File("images//test");
             if (!folder.exists()) {
                 folder.mkdir();
             }
             for (FileItem item : items) {
-                //Если элемент не поле, то это файл и из него можно прочитать весь входной поток и записать его в файл или напрямую в базу данных.
                 if (!item.isFormField()) {
                     File file = new File(folder + File.separator + item.getName());
                     try (FileOutputStream out = new FileOutputStream(file)) {
                         out.write(item.getInputStream().readAllBytes());
                     }
-                    //после создания файла - записываем имя в базу
-                    //PsqlStore.instOf().save(photo);
-                    //PsqlStore.instOf().save(new Photo(0,"FirstPhoto"));
-                    PsqlStore.instOf().save(new Photo(0,item.getName()));
+                    PsqlStore.instOf().save(new Photo(0, item.getName()));
                 }
             }
         } catch (FileUploadException e) {
