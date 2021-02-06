@@ -5,6 +5,10 @@
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
   <servlet>
+    <servlet-name>DeleteServlet</servlet-name>
+    <servlet-class>ru.job4j.servlets.DeleteServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>UploadServlet</servlet-name>
     <servlet-class>ru.job4j.servlets.UploadServlet</servlet-class>
   </servlet>
@@ -27,6 +31,10 @@
   <servlet-mapping>
     <servlet-name>PostServlet</servlet-name>
     <url-pattern>/posts.do</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>DeleteServlet</servlet-name>
+    <url-pattern>/delete</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>UploadServlet</servlet-name>

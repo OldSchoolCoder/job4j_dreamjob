@@ -76,7 +76,9 @@ public class PsqlStore implements Store {
         try (Connection cn = pool.getConnection();
              //PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate")
              //PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate INNER JOIN photo ON id=id")
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate INNER JOIN photo ON candidate.id=photo.id")
+             //PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate INNER JOIN photo ON candidate.id=photo.id")
+             //выводим кандидаов даже без фото - ошибок не было
+             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id")
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {
@@ -157,13 +159,16 @@ public class PsqlStore implements Store {
     public Candidate findCandidateById(int id) {
         Candidate result = new Candidate(0, "", "TestPhoto");
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate WHERE id=?")
+             //PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate WHERE id=?")
+             //PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id")
+             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id where candidate.id=?")
         ) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     result.setId(rs.getInt("id"));
                     result.setName(rs.getString("name"));
+                    result.setPhoto(rs.getString(4));
                 } else {
                     LOGGER.warning("Error! Can't find data in storage");
                 }
@@ -172,5 +177,20 @@ public class PsqlStore implements Store {
             LOGGER.log(Level.WARNING, "Error! SQLException!", e);
         }
         return result;
+    }
+
+    @Override
+    public void delete(Model model) {
+        //final String tableName = model.getClass().getSimpleName().toLowerCase();
+        try (Connection cn = pool.getConnection();
+             //PreparedStatement ps = cn.prepareStatement("DELETE FROM " + tableName + " WHERE id=?")
+             PreparedStatement ps = cn.prepareStatement("DELETE FROM candidate where id=?; DELETE FROM photo where id=?")
+        ) {
+            ps.setInt(1, model.getId());
+            ps.setInt(2, model.getId());
+            ps.execute();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        }
     }
 }

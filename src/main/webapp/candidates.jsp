@@ -66,7 +66,7 @@
                             </a>
                         </td>
                         <td>
-                            <a href="">
+                            <a href="<c:url value='/delete?id=${can.id}'/>">
                                 <span style="font-size: 1rem;">
                                     <span style="color: rgb(204, 207, 3);">
                                         <i class="fas fa-trash-alt"></i>
