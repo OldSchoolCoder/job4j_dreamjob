@@ -74,11 +74,11 @@ public class PsqlStore implements Store {
     public Collection<Candidate> findAllCandidates() {
         List<Candidate> candidates = new ArrayList<>();
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate")
+             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id")
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {
-                    candidates.add(new Candidate(it.getInt("id"), it.getString("name")));
+                    candidates.add(new Candidate(it.getInt(1), it.getString(2), it.getString(4)));
                 }
             }
         } catch (Exception e) {
@@ -149,15 +149,16 @@ public class PsqlStore implements Store {
 
     @Override
     public Candidate findCandidateById(int id) {
-        Candidate result = new Candidate(0, "");
+        Candidate result = new Candidate(0, "", "TestPhoto");
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate WHERE id=?")
+             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id where candidate.id=?")
         ) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     result.setId(rs.getInt("id"));
                     result.setName(rs.getString("name"));
+                    result.setPhoto(rs.getString(4));
                 } else {
                     LOGGER.warning("Error! Can't find data in storage");
                 }
@@ -166,5 +167,18 @@ public class PsqlStore implements Store {
             LOGGER.log(Level.WARNING, "Error! SQLException!", e);
         }
         return result;
+    }
+
+    @Override
+    public void delete(Model model) {
+        try (Connection cn = pool.getConnection();
+             PreparedStatement ps = cn.prepareStatement("DELETE FROM candidate where id=?; DELETE FROM photo where id=?")
+        ) {
+            ps.setInt(1, model.getId());
+            ps.setInt(2, model.getId());
+            ps.execute();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        }
     }
 }
