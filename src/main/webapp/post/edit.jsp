@@ -1,6 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="ru.job4j.dream.store.PsqlStore" %>
 <%@ page import="ru.job4j.dream.model.Post" %>
+<%@ page import="java.util.Collection" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <!doctype html>
 <html lang="en">
 <head>
@@ -32,6 +34,43 @@
     }
 %>
 <div class="container pt-3">
+    <div class="collapse" id="navbarToggleExternalContent">
+        <div class="bg p-4">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-secondary fw-light"
+                       href="<%=request.getContextPath()%>/posts.do">Вакансии</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-secondary fw-light" href="<%=request.getContextPath()%>/candidates.do">Кандидаты</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-secondary fw-light" href="<%=request.getContextPath()%>/post/edit.jsp">Добавить
+                        вакансию</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-secondary fw-light" href="<%=request.getContextPath()%>/candidate/edit.jsp">Добавить
+                        кандидата</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-secondary fw-light" href="<%=request.getContextPath()%>/login.jsp">
+                        <c:out value="${user.name}"/> | Выйти
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <nav class="navbar navbar-light " style="background-color: #ffffff;">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
+</div>
+<div class="container pt-3">
     <div class="row">
         <div class="card" style="width: 100%">
             <div class="card-header">
@@ -53,5 +92,9 @@
         </div>
     </div>
 </div>
+<!-- JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+        crossorigin="anonymous"></script>
 </body>
 </html>
