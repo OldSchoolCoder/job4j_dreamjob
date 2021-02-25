@@ -130,13 +130,11 @@ public class PsqlStore implements Store {
 
     private void create(User user) {
         try (Connection cn = pool.getConnection();
-             //PreparedStatement ps = cn.prepareStatement("INSERT INTO user(name, email, password) VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)
-             //PreparedStatement ps = cn.prepareStatement("INSERT INTO user VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)
-             PreparedStatement ps = cn.prepareStatement("INSERT INTO user(name) VALUES (?)", PreparedStatement.RETURN_GENERATED_KEYS)
+             PreparedStatement ps = cn.prepareStatement("INSERT INTO job_user(name, email, password) VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)
         ) {
             ps.setString(1, user.getName());
-            //ps.setString(2, user.getEmail());
-            //ps.setString(3, user.getPassword());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPassword());
             ps.execute();
             try (ResultSet id = ps.getGeneratedKeys()) {
                 if (id.next()) {
@@ -146,8 +144,21 @@ public class PsqlStore implements Store {
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error! SQLException!", e);
         }
-        LOGGER.warning("Hello from create User! Log");
-        System.out.println("Hello from create User!");
+    }
+
+    private void update(User user) {
+        try (Connection cn = pool.getConnection();
+             //PreparedStatement ps = cn.prepareStatement("UPDATE " + tableName + " SET name=? WHERE id=?")
+             PreparedStatement ps = cn.prepareStatement("UPDATE job_user SET name=?, email=?, password=? WHERE id=?")
+        ) {
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPassword());
+            ps.setInt(4, user.getId());
+            ps.execute();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        }
     }
 
     private Model create(Model model) {
