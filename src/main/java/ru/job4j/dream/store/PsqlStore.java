@@ -148,7 +148,6 @@ public class PsqlStore implements Store {
 
     private void update(User user) {
         try (Connection cn = pool.getConnection();
-             //PreparedStatement ps = cn.prepareStatement("UPDATE " + tableName + " SET name=? WHERE id=?")
              PreparedStatement ps = cn.prepareStatement("UPDATE job_user SET name=?, email=?, password=? WHERE id=?")
         ) {
             ps.setString(1, user.getName());
@@ -250,6 +249,13 @@ public class PsqlStore implements Store {
 
     @Override
     public void delete(User user) {
-
+        try (Connection cn = pool.getConnection();
+             PreparedStatement ps = cn.prepareStatement("DELETE FROM job_user where id=?")
+        ) {
+            ps.setInt(1, user.getId());
+            ps.execute();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        }
     }
 }
