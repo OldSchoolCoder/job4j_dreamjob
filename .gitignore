@@ -1,4 +1,6 @@
 *.iml
 upload1.jsp
+sqlHelper.sq
 sqlHelper.sql
 Hr.java
+/db/

@@ -2,7 +2,7 @@ package ru.job4j.dream.model;
 
 import java.util.Objects;
 
-public class User {
+public class User implements Model{
     private int id;
     private String name;
     private String email;
