@@ -4,6 +4,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import ru.job4j.dream.model.Candidate;
 import ru.job4j.dream.model.Model;
 import ru.job4j.dream.model.Post;
+import ru.job4j.dream.model.User;
 
 import java.util.logging.*;
 import java.io.BufferedReader;
@@ -87,11 +88,75 @@ public class PsqlStore implements Store {
         return candidates;
     }
 
+    @Override
+    public User findByEmail(String email) {
+        User resultUser = new User();
+        try (Connection cn = pool.getConnection();
+             PreparedStatement ps = cn.prepareStatement("SELECT * FROM job_user WHERE email=?")
+        ) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    resultUser.setId(rs.getInt("id"));
+                    resultUser.setName(rs.getString("name"));
+                    resultUser.setEmail(rs.getString("email"));
+                    resultUser.setPassword(rs.getString("password"));
+                } else {
+                    LOGGER.warning("Error! Can't find data in storage");
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        }
+        return resultUser;
+    }
+
     public void save(Model model) {
         if (model.getId() == 0) {
             create(model);
         } else {
             update(model);
+        }
+    }
+
+    @Override
+    public void save(User user) {
+        if (user.getId() == 0) {
+            create(user);
+        } else {
+            update(user);
+        }
+    }
+
+    private void create(User user) {
+        try (Connection cn = pool.getConnection();
+             PreparedStatement ps = cn.prepareStatement("INSERT INTO job_user(name, email, password) VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)
+        ) {
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPassword());
+            ps.execute();
+            try (ResultSet id = ps.getGeneratedKeys()) {
+                if (id.next()) {
+                    user.setId(id.getInt(1));
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        }
+    }
+
+    private void update(User user) {
+        try (Connection cn = pool.getConnection();
+             PreparedStatement ps = cn.prepareStatement("UPDATE job_user SET name=?, email=?, password=? WHERE id=?")
+        ) {
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPassword());
+            ps.setInt(4, user.getId());
+            ps.execute();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
         }
     }
 
@@ -176,6 +241,18 @@ public class PsqlStore implements Store {
         ) {
             ps.setInt(1, model.getId());
             ps.setInt(2, model.getId());
+            ps.execute();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        }
+    }
+
+    @Override
+    public void delete(User user) {
+        try (Connection cn = pool.getConnection();
+             PreparedStatement ps = cn.prepareStatement("DELETE FROM job_user where id=?")
+        ) {
+            ps.setInt(1, user.getId());
             ps.execute();
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error! SQLException!", e);
