@@ -55,18 +55,15 @@ public class PsqlStore implements Store {
     }
 
     @Override
-    public Collection<Post> findAllPosts() {
+    public Collection<Post> findAllPosts() throws SQLException {
         List<Post> posts = new ArrayList<>();
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM post")
+             PreparedStatement ps = cn.prepareStatement("SELECT * FROM post");
+             ResultSet it = ps.executeQuery()
         ) {
-            try (ResultSet it = ps.executeQuery()) {
-                while (it.next()) {
-                    posts.add(new Post(it.getInt("id"), it.getString("name")));
-                }
+            while (it.next()) {
+                posts.add(new Post(it.getInt("id"), it.getString("name")));
             }
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
         }
         return posts;
     }

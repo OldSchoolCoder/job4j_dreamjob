@@ -5,10 +5,11 @@ import ru.job4j.dream.model.Model;
 import ru.job4j.dream.model.Post;
 import ru.job4j.dream.model.User;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 public interface Store {
-    Collection<Post> findAllPosts();
+    Collection<Post> findAllPosts() throws SQLException;
 
     Collection<Candidate> findAllCandidates();
 
