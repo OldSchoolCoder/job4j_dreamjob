@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,8 +54,8 @@ public class UploadServlet extends HttpServlet {
                     PsqlStore.instOf().save(new Photo(0, item.getName()));
                 }
             }
-        } catch (FileUploadException e) {
-            e.printStackTrace();
+        } catch (FileUploadException | SQLException e) {
+            throw new ServletException("Error! FileUploadException or SQLException!", e);
         }
         doGet(req, resp);
     }

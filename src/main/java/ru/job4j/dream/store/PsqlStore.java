@@ -24,7 +24,6 @@ public class PsqlStore implements Store {
     private final BasicDataSource pool = new BasicDataSource();
     private static final Logger LOGGER = Logger.getLogger(PsqlStore.class.getName());
 
-    //здесь нужен try потому что, иначе class Lazy требует обработку, а там невозможно сделает ее
     private PsqlStore() {
         Properties cfg = new Properties();
         try (BufferedReader io = new BufferedReader(

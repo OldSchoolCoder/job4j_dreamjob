@@ -17,7 +17,6 @@ public class PostServlet extends HttpServlet {
         try {
             req.setAttribute("posts", PsqlStore.instOf().findAllPosts());
         } catch (SQLException e) {
-            e.printStackTrace();
             throw new ServletException("Error! SQLException!",e);
         }
         req.setAttribute("user", req.getSession().getAttribute("user"));
@@ -27,12 +26,16 @@ public class PostServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
-        PsqlStore.instOf().save(
-                new Post(
-                        Integer.valueOf(req.getParameter("id")),
-                        req.getParameter("name")
-                )
-        );
+        try {
+            PsqlStore.instOf().save(
+                    new Post(
+                            Integer.valueOf(req.getParameter("id")),
+                            req.getParameter("name")
+                    )
+            );
+        } catch (SQLException e) {
+            throw new ServletException("Error! SQLException!", e);
+        }
         resp.sendRedirect(req.getContextPath() + "/posts.do");
     }
 }
