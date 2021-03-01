@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -25,11 +26,13 @@ import java.util.logging.Logger;
 
 public class CandidateServlet extends HttpServlet {
 
-    private static final Logger LOGGER = Logger.getLogger(PsqlStore.class.getName());
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setAttribute("candidates", PsqlStore.instOf().findAllCandidates());
+        try {
+            req.setAttribute("candidates", PsqlStore.instOf().findAllCandidates());
+        } catch (SQLException e) {
+            throw new ServletException("Error! SQLException!", e);
+        }
         req.getRequestDispatcher("candidates.jsp").forward(req, resp);
     }
 
@@ -76,9 +79,13 @@ public class CandidateServlet extends HttpServlet {
         Candidate tempCandidate = null;
         if (photo != null && name != null) {
             tempCandidate = new Candidate(id, name, photo);
-            PsqlStore.instOf().save(tempCandidate);
+            try {
+                PsqlStore.instOf().save(tempCandidate);
+            } catch (SQLException e) {
+                throw new ServletException("Error! SQLException!", e);
+            }
         } else {
-            LOGGER.warning("Error! Photo or Name is NULL");
+            throw new ServletException("Error! Photo or Name is NULL");
         }
         resp.sendRedirect(req.getContextPath() + "/candidates.do");
     }

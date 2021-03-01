@@ -4,11 +4,12 @@ import ru.job4j.dream.model.Candidate;
 import ru.job4j.dream.model.Model;
 import ru.job4j.dream.model.Post;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
 public class PsqlMain {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         Store store = PsqlStore.instOf();
         store.save(new Post(0, "Java Job"));
         System.out.println("Test function findAllPosts:");

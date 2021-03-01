@@ -6,6 +6,7 @@ import ru.job4j.dream.model.Model;
 import ru.job4j.dream.model.Post;
 import ru.job4j.dream.model.User;
 
+import java.io.IOException;
 import java.util.logging.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -29,13 +30,13 @@ public class PsqlStore implements Store {
                 new FileReader("db.properties")
         )) {
             cfg.load(io);
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error! IllegalStateException!", e);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error! IOException!", e);
         }
         try {
             Class.forName(cfg.getProperty("jdbc.driver"));
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error! IllegalStateException!", e);
+        } catch (ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Error! ClassNotFoundException!", e);
         }
         pool.setDriverClassName(cfg.getProperty("jdbc.driver"));
         pool.setUrl(cfg.getProperty("jdbc.url"));
@@ -55,63 +56,57 @@ public class PsqlStore implements Store {
     }
 
     @Override
-    public Collection<Post> findAllPosts() {
+    public Collection<Post> findAllPosts() throws SQLException {
         List<Post> posts = new ArrayList<>();
-        try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM post")
-        ) {
-            try (ResultSet it = ps.executeQuery()) {
-                while (it.next()) {
-                    posts.add(new Post(it.getInt("id"), it.getString("name")));
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        Connection cn = pool.getConnection();
+        PreparedStatement ps = cn.prepareStatement("SELECT * FROM post");
+        ResultSet it = ps.executeQuery();
+        while (it.next()) {
+            posts.add(new Post(it.getInt("id"), it.getString("name")));
         }
+        cn.close();
+        ps.close();
+        it.close();
         return posts;
     }
 
     @Override
-    public Collection<Candidate> findAllCandidates() {
+    public Collection<Candidate> findAllCandidates() throws SQLException {
         List<Candidate> candidates = new ArrayList<>();
-        try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id")
-        ) {
-            try (ResultSet it = ps.executeQuery()) {
-                while (it.next()) {
-                    candidates.add(new Candidate(it.getInt(1), it.getString(2), it.getString(4)));
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        Connection cn = pool.getConnection();
+        PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id");
+        ResultSet it = ps.executeQuery();
+        while (it.next()) {
+            candidates.add(new Candidate(it.getInt(1), it.getString(2), it.getString(4)));
         }
+        cn.close();
+        ps.close();
+        it.close();
         return candidates;
     }
 
     @Override
-    public User findByEmail(String email) {
+    public User findByEmail(String email) throws SQLException {
         User resultUser = new User();
-        try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM job_user WHERE email=?")
-        ) {
-            ps.setString(1, email);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    resultUser.setId(rs.getInt("id"));
-                    resultUser.setName(rs.getString("name"));
-                    resultUser.setEmail(rs.getString("email"));
-                    resultUser.setPassword(rs.getString("password"));
-                } else {
-                    LOGGER.warning("Error! Can't find data in storage");
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        Connection cn = pool.getConnection();
+        PreparedStatement ps = cn.prepareStatement("SELECT * FROM job_user WHERE email=?");
+        ps.setString(1, email);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            resultUser.setId(rs.getInt("id"));
+            resultUser.setName(rs.getString("name"));
+            resultUser.setEmail(rs.getString("email"));
+            resultUser.setPassword(rs.getString("password"));
+        } else {
+            throw new SQLException("Error! Can't find data in storage");
         }
+        cn.close();
+        ps.close();
+        rs.close();
         return resultUser;
     }
 
-    public void save(Model model) {
+    public void save(Model model) throws SQLException {
         if (model.getId() == 0) {
             create(model);
         } else {
@@ -120,7 +115,7 @@ public class PsqlStore implements Store {
     }
 
     @Override
-    public void save(User user) {
+    public void save(User user) throws SQLException {
         if (user.getId() == 0) {
             create(user);
         } else {
@@ -128,134 +123,118 @@ public class PsqlStore implements Store {
         }
     }
 
-    private void create(User user) {
-        try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("INSERT INTO job_user(name, email, password) VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)
-        ) {
-            ps.setString(1, user.getName());
-            ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPassword());
-            ps.execute();
-            try (ResultSet id = ps.getGeneratedKeys()) {
-                if (id.next()) {
-                    user.setId(id.getInt(1));
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+    private void create(User user) throws SQLException {
+        Connection cn = pool.getConnection();
+        PreparedStatement ps = cn.prepareStatement("INSERT INTO job_user(name, email, password) VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+        ps.setString(1, user.getName());
+        ps.setString(2, user.getEmail());
+        ps.setString(3, user.getPassword());
+        ps.execute();
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            user.setId(rs.getInt(1));
         }
+        cn.close();
+        ps.close();
+        rs.close();
     }
 
-    private void update(User user) {
-        try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("UPDATE job_user SET name=?, email=?, password=? WHERE id=?")
-        ) {
-            ps.setString(1, user.getName());
-            ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPassword());
-            ps.setInt(4, user.getId());
-            ps.execute();
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
-        }
+    private void update(User user) throws SQLException {
+        Connection cn = pool.getConnection();
+        PreparedStatement ps = cn.prepareStatement("UPDATE job_user SET name=?, email=?, password=? WHERE id=?");
+        ps.setString(1, user.getName());
+        ps.setString(2, user.getEmail());
+        ps.setString(3, user.getPassword());
+        ps.setInt(4, user.getId());
+        ps.execute();
+        cn.close();
+        ps.close();
     }
 
-    private Model create(Model model) {
+    private Model create(Model model) throws SQLException {
         final String tableName = model.getClass().getSimpleName().toLowerCase();
-        try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("INSERT INTO " + tableName + "(name) VALUES (?)", PreparedStatement.RETURN_GENERATED_KEYS)
-        ) {
-            ps.setString(1, model.getName());
-            ps.execute();
-            try (ResultSet id = ps.getGeneratedKeys()) {
-                if (id.next()) {
-                    model.setId(id.getInt(1));
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        Connection cn = pool.getConnection();
+        PreparedStatement ps = cn.prepareStatement("INSERT INTO " + tableName + "(name) VALUES (?)", PreparedStatement.RETURN_GENERATED_KEYS);
+        ps.setString(1, model.getName());
+        ps.execute();
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            model.setId(rs.getInt(1));
         }
+        cn.close();
+        ps.close();
+        rs.close();
         return model;
     }
 
-    private void update(Model model) {
+    private void update(Model model) throws SQLException {
         final String tableName = model.getClass().getSimpleName().toLowerCase();
-        try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("UPDATE " + tableName + " SET name=? WHERE id=?")
-        ) {
-            ps.setString(1, model.getName());
-            ps.setInt(2, model.getId());
-            ps.execute();
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
-        }
+        Connection cn = pool.getConnection();
+        PreparedStatement ps = cn.prepareStatement("UPDATE " + tableName + " SET name=? WHERE id=?");
+        ps.setString(1, model.getName());
+        ps.setInt(2, model.getId());
+        ps.execute();
+        cn.close();
+        ps.close();
     }
 
     @Override
-    public Post findById(int id) {
+    public Post findById(int id) throws SQLException {
         Post resultPost = new Post(0, "");
-        try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM post WHERE id=?")
-        ) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    resultPost.setId(rs.getInt("id"));
-                    resultPost.setName(rs.getString("name"));
-                } else {
-                    LOGGER.warning("Error! Can't find data in storage");
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        Connection cn = pool.getConnection();
+        PreparedStatement ps = cn.prepareStatement("SELECT * FROM post WHERE id=?");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            resultPost.setId(rs.getInt("id"));
+            resultPost.setName(rs.getString("name"));
+        } else {
+            throw new SQLException("Error! Can't find data in storage");
         }
+        cn.close();
+        ps.close();
+        rs.close();
         return resultPost;
     }
 
     @Override
-    public Candidate findCandidateById(int id) {
+    public Candidate findCandidateById(int id) throws SQLException {
         Candidate result = new Candidate(0, "", "TestPhoto");
-        try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id where candidate.id=?")
-        ) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    result.setId(rs.getInt("id"));
-                    result.setName(rs.getString("name"));
-                    result.setPhoto(rs.getString(4));
-                } else {
-                    LOGGER.warning("Error! Can't find data in storage");
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
+        Connection cn = pool.getConnection();
+        PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id where candidate.id=?");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            result.setId(rs.getInt("id"));
+            result.setName(rs.getString("name"));
+            result.setPhoto(rs.getString(4));
+        } else {
+            throw new SQLException("Error! Can't find data in storage");
         }
+        cn.close();
+        ps.close();
+        rs.close();
         return result;
     }
 
     @Override
-    public void delete(Model model) {
+    public void delete(Model model) throws SQLException {
         try (Connection cn = pool.getConnection();
              PreparedStatement ps = cn.prepareStatement("DELETE FROM candidate where id=?; DELETE FROM photo where id=?")
         ) {
             ps.setInt(1, model.getId());
             ps.setInt(2, model.getId());
             ps.execute();
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
         }
     }
 
     @Override
-    public void delete(User user) {
-        try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("DELETE FROM job_user where id=?")
-        ) {
-            ps.setInt(1, user.getId());
-            ps.execute();
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error! SQLException!", e);
-        }
+    public void delete(User user) throws SQLException {
+        Connection cn = pool.getConnection();
+        PreparedStatement ps = cn.prepareStatement("DELETE FROM job_user where id=?");
+        ps.setInt(1, user.getId());
+        ps.execute();
+        cn.close();
+        ps.close();
     }
 }

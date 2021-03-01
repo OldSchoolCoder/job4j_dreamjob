@@ -5,24 +5,25 @@ import ru.job4j.dream.model.Model;
 import ru.job4j.dream.model.Post;
 import ru.job4j.dream.model.User;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 public interface Store {
-    Collection<Post> findAllPosts();
+    Collection<Post> findAllPosts() throws SQLException;
 
-    Collection<Candidate> findAllCandidates();
+    Collection<Candidate> findAllCandidates() throws SQLException;
 
-    User findByEmail(String email);
+    User findByEmail(String email) throws SQLException;
 
-    void save(Model model);
+    void save(Model model) throws SQLException;
 
-    void save(User user);
+    void save(User user) throws SQLException;
 
-    Post findById(int id);
+    Post findById(int id) throws SQLException;
 
-    Candidate findCandidateById(int id);
+    Candidate findCandidateById(int id) throws SQLException;
 
-    void delete(Model model);
+    void delete(Model model) throws SQLException;
 
-    void delete(User user);
+    void delete(User user) throws SQLException;
 }
