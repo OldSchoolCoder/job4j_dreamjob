@@ -20,7 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
             integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
             crossorigin="anonymous"></script>
-    <title>Авторизация</title>
+    <title>Регистрация</title>
 </head>
 
 <body>
@@ -64,17 +64,17 @@
     <div class="card border-warning mb-3">
         <div class="card-header fw-light">
             <div class="btn-group">
-                <button type="button" class="btn btn-warning dropdown-toggle fw-light" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                    Авторизация
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item fw-light" href="/dreamjob/reg.jsp">Регистрация</a></li>
-                </ul>
+                Регистрация
             </div>
         </div>
         <div class="card-body fw-light">
-            <form action="<%=request.getContextPath()%>/auth.do" method="post">
+            <form action="/dreamjob/reg.do" method="post">
+                <div class="input-group mb-3 fw-light">
+                    <span class="input-group-text fw-light" id="basic-addon1">@</span>
+                    <input type="text" class="form-control fw-light" name="username" placeholder="Username"
+                           aria-label="Username"
+                           aria-describedby="basic-addon1">
+                </div>
                 <div class="mb-3">
                     <label>Почта</label>
                     <input type="text" class="form-control" name="email">
@@ -83,7 +83,7 @@
                     <label>Пароль</label>
                     <input type="text" class="form-control" name="password">
                 </div>
-                <button type="submit" class="btn btn-warning fw-light">Войти</button>
+                <button type="submit" class="btn btn-warning fw-light">Зарегистрироваться</button>
             </form>
         </div>
     </div>
@@ -94,4 +94,3 @@
         crossorigin="anonymous"></script>
 </body>
 </html>
-
