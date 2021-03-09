@@ -75,7 +75,6 @@ public class CandidateServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         Candidate tempCandidate = null;
         if (photo != null && name != null) {
             tempCandidate = new Candidate(id, name, photo);

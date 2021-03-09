@@ -129,8 +129,8 @@ public class PsqlStore implements Store {
         ps.setString(1, user.getName());
         ps.setString(2, user.getEmail());
         ps.setString(3, user.getPassword());
-        ps.execute();
-        ResultSet rs = ps.executeQuery();
+        ResultSet rs = ps.getGeneratedKeys();
+        ps.executeUpdate();
         if (rs.next()) {
             user.setId(rs.getInt(1));
         }

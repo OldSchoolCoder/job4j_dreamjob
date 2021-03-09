@@ -31,7 +31,6 @@ public class DeleteServlet extends HttpServlet {
                 PsqlStore.instOf().delete(candidate);
                 Files.delete(Path.of("images//photo" + File.separator + candidate.getPhoto()));
             }
-
             req.setAttribute("candidates", PsqlStore.instOf().findAllCandidates());
         } catch (SQLException e) {
             throw new ServletException("Error! SQLException!", e);
