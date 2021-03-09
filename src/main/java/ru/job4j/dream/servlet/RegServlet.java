@@ -29,22 +29,14 @@ public class RegServlet extends HttpServlet {
                 throw new ServletException(" Registration Error! User already exists! ");
             }
         } catch (SQLException throwables) {
-            //если бросет SQLException - бездействие, потому что SQLException возникает, когда он ненаходит нового пользователя
-            //throw new ServletException(" Error in user=store.findByEmail(email)! ");
-        } catch (ServletException e){
+        } catch (ServletException e) {
             throw new ServletException(" Registration Error! User already exists! ", e);
         }
         try {
-            //if (store.findByEmail(email) == null) {
-                store.save(user);
-           //} else {
-                //cheked
-                //throw new ServletException("Registration Error! User already exists!");
-            //}
+            store.save(user);
         } catch (SQLException e) {
             throw new ServletException("Registration Error! Can't save user!", e);
         }
-        //resp.sendRedirect(req.getContextPath() + "/auth.do");
-        req.getRequestDispatcher("login.jsp").forward(req,resp);
+        req.getRequestDispatcher("login.jsp").forward(req, resp);
     }
 }

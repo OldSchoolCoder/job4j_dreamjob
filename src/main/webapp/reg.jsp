@@ -71,7 +71,8 @@
             <form action="/dreamjob/reg.do" method="post">
                 <div class="input-group mb-3 fw-light">
                     <span class="input-group-text fw-light" id="basic-addon1">@</span>
-                    <input type="text" class="form-control fw-light" name="username" placeholder="Username" aria-label="Username"
+                    <input type="text" class="form-control fw-light" name="username" placeholder="Username"
+                           aria-label="Username"
                            aria-describedby="basic-addon1">
                 </div>
                 <div class="mb-3">
@@ -92,5 +93,4 @@
         integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
         crossorigin="anonymous"></script>
 </body>
-
 </html>
