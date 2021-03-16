@@ -19,15 +19,18 @@ import static org.mockito.Mockito.when;
 //
 //import org.powermock.*;
 import ru.job4j.dream.store.MemStore;
+import ru.job4j.dream.store.PsqlStore;
+import ru.job4j.dream.store.Store;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(MemStore.class)
+@PrepareForTest(PsqlStore.class)
 public class PostServletTest {
 
     @Test
@@ -35,17 +38,20 @@ public class PostServletTest {
     }
 
     @Test
-    public void doPost() throws ServletException, IOException {
+    public void doPost() throws ServletException, IOException, SQLException {
         //создаем заглушку
-        MemStore memStore = new MemStore();
-        PowerMockito.mockStatic(MemStore.class);
-
-        Mockito.when(MemStore.instOf()).thenReturn(memStore);
+        Store storeStub = new PsqlStoreStub();
+        PowerMockito.mockStatic(PsqlStore.class);
+        //когда инициализируется хранилище - возвращаем заглушку
+        Mockito.when(PsqlStore.instOf()).thenReturn(storeStub);
         HttpServletRequest req = mock(HttpServletRequest.class);
         HttpServletResponse resp = mock(HttpServletResponse.class);
+        //создаем правило для заглушки
+        when(req.getParameter("id")).thenReturn("0");
         when(req.getParameter("name")).thenReturn("JavaJob");
+        //вызываем сервлет для теста
         new PostServlet().doPost(req,resp);
-        Assert.assertEquals(1,"JavaJob");
+        Assert.assertEquals(storeStub.findById(1).getName(),"JavaJob");
         //хоть и зачеркнуто, но компилируется
         //assertThat(1,is(1));
     }
