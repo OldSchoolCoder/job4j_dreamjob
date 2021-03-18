@@ -7,7 +7,9 @@ import ru.job4j.dream.model.User;
 import ru.job4j.dream.store.Store;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,7 +20,8 @@ public class PsqlStoreStub implements Store {
 
     @Override
     public Collection<Post> findAllPosts() throws SQLException {
-        return null;
+        List<Post> testPosts = new ArrayList<>();
+        return testPosts;
     }
 
     @Override

@@ -27,6 +27,7 @@ import ru.job4j.dream.store.Store;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -48,9 +49,17 @@ public class PostServletTest {
         Mockito.when(PsqlStore.instOf()).thenReturn(storeStub);
         HttpServletRequest req = mock(HttpServletRequest.class);
         HttpServletResponse resp = mock(HttpServletResponse.class);
+        HttpSession session=mock(HttpSession.class);
+        //HttpSession session=req.getSession();
         //создаем правило для заглушки (настройка)
         //подменяем req.getSession().getAttribute("user") на user, иначе выскакивает NPE
-        when(req.getSession().getAttribute("user")).thenReturn("user");
+        //when(req.getSession()).thenReturn(user);
+        //when(req.getSession().getAttribute("user")).thenReturn("user");
+        //NPE
+        when(req.getSession()).thenReturn(session);
+        //when(req.getSession().getAttribute("user")).thenReturn(session.getAttribute("user"));
+        when(session.getAttribute("user")).thenReturn(user);
+        //when(resp.getHeader("1")).thenReturn("1");
         //вызываем сервлет для теста
         new PostServlet().doGet(req,resp);
         Assert.assertEquals(storeStub.findAllPosts(),testPosts);
