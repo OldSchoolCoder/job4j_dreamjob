@@ -27,10 +27,10 @@
             url: 'http://localhost:8080/dreamjob/greet',
             data: 'name=' + $('#exampleInputEmail1').val(),
             dataType: 'text'
-        }).done(function (data) {
-            $("#email").text($('#exampleInputEmail1').val());
+        }).done(function (response) {
+            alert(response);
         }).fail(function (err) {
-            alert('err');
+            alert(err);
         });
     }
 </script>
