@@ -22,11 +22,8 @@
 <body>
 <script>
     function sendGreeting() {
-        $.ajax({
-            type: 'GET',
-            url: 'http://localhost:8080/dreamjob/greet',
-            data: 'name=' + $('#exampleInputEmail1').val(),
-            dataType: 'text'
+        $.get('http://localhost:8080/dreamjob/greet', {
+            name: $('#exampleInputEmail1').val()
         }).done(function (response) {
             alert(response);
         }).fail(function (err) {
