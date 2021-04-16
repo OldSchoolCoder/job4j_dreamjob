@@ -20,6 +20,23 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
             integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
             crossorigin="anonymous"></script>
+    <script>
+        function validate() {
+            let counter = 0;
+            $('form').find('input').each(function () {
+                if ($(this).val() == '') {
+                    alert('Enter ' + $(this).attr('id'));
+                    return false;
+                } else {
+                    counter++;
+                }
+            });
+            if (counter == 2) {
+                $("form").submit();
+            }
+            return false;
+        }
+    </script>
     <title>Авторизация</title>
 </head>
 
@@ -77,13 +94,13 @@
             <form action="<%=request.getContextPath()%>/auth.do" method="post">
                 <div class="mb-3">
                     <label>Почта</label>
-                    <input type="text" class="form-control" name="email">
+                    <input type="text" class="form-control" name="email" id="email">
                 </div>
                 <div class="mb-3">
                     <label>Пароль</label>
-                    <input type="text" class="form-control" name="password">
+                    <input type="text" class="form-control" name="password" id="password">
                 </div>
-                <button type="submit" class="btn btn-warning fw-light">Войти</button>
+                <button type="submit" onclick="return validate()" class="btn btn-warning fw-light">Войти</button>
             </form>
         </div>
     </div>

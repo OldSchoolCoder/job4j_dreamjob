@@ -20,7 +20,7 @@ public class DeleteServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String id = req.getParameter("id");
-        Candidate candidate = new Candidate(0, "", "TestPhoto");
+        Candidate candidate = new Candidate(0, "", "TestPhoto","");
         try {
             if (id != null) {
                 candidate = PsqlStore.instOf().findCandidateById(Integer.valueOf(id));

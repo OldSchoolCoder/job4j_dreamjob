@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 public interface Store {
+    Collection<String> getCityList() throws SQLException;
+
     Collection<Post> findAllPosts() throws SQLException;
 
     Collection<Candidate> findAllCandidates() throws SQLException;

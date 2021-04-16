@@ -48,6 +48,14 @@
         <servlet-name>GreetingServlet</servlet-name>
         <servlet-class>ru.job4j.servlets.GreetingServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CityDownload</servlet-name>
+        <servlet-class>ru.job4j.servlets.CityDownload</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CityDownload</servlet-name>
+        <url-pattern>/city</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>GreetingServlet</servlet-name>
         <url-pattern>/greet</url-pattern>

@@ -27,13 +27,13 @@ public class PsqlMain {
         System.out.println("Name = " + store.findById(1).getName());
         System.out.println();
         System.out.println("Test function findAllCandidates");
-        store.save(new Candidate(0, "Mike", "TestPhoto"));
+        store.save(new Candidate(0, "Mike", "TestPhoto","TestCity"));
         for (Candidate candidate : store.findAllCandidates()) {
             System.out.println(candidate.getId() + " " + candidate.getName());
         }
         System.out.println();
         System.out.println("Test function update for Candidates:");
-        store.save(new Candidate(1, "Donald", "TestPhoto"));
+        store.save(new Candidate(1, "Donald", "TestPhoto","TestCity"));
         System.out.println("Id = " + store.findCandidateById(1).getId());
         System.out.println("Name = " + store.findCandidateById(1).getName());
     }

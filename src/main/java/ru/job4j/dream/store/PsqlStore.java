@@ -7,13 +7,10 @@ import ru.job4j.dream.model.Post;
 import ru.job4j.dream.model.User;
 
 import java.io.IOException;
+import java.sql.*;
 import java.util.logging.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -56,6 +53,21 @@ public class PsqlStore implements Store {
     }
 
     @Override
+    public Collection<String> getCityList() throws SQLException {
+        List<String> cityList = new ArrayList<>();
+        Connection cn = pool.getConnection();
+        PreparedStatement ps = cn.prepareStatement("SELECT * FROM city_id");
+        ResultSet it = ps.executeQuery();
+        while (it.next()) {
+            cityList.add(it.getString("city"));
+        }
+        cn.close();
+        ps.close();
+        it.close();
+        return cityList;
+    }
+
+    @Override
     public Collection<Post> findAllPosts() throws SQLException {
         List<Post> posts = new ArrayList<>();
         Connection cn = pool.getConnection();
@@ -77,7 +89,7 @@ public class PsqlStore implements Store {
         PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id");
         ResultSet it = ps.executeQuery();
         while (it.next()) {
-            candidates.add(new Candidate(it.getInt(1), it.getString(2), it.getString(4)));
+            candidates.add(new Candidate(it.getInt(1), it.getString(2), it.getString(5), it.getString(3)));
         }
         cn.close();
         ps.close();
@@ -154,10 +166,17 @@ public class PsqlStore implements Store {
     private Model create(Model model) throws SQLException {
         final String tableName = model.getClass().getSimpleName().toLowerCase();
         Connection cn = pool.getConnection();
-        PreparedStatement ps = cn.prepareStatement("INSERT INTO " + tableName + "(name) VALUES (?)", PreparedStatement.RETURN_GENERATED_KEYS);
-        ps.setString(1, model.getName());
-        ps.execute();
-        ResultSet rs = ps.executeQuery();
+        PreparedStatement ps = null;
+        if (model.getCity() == null) {
+            ps = cn.prepareStatement("INSERT INTO " + tableName + "(name) VALUES (?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setString(1, model.getName());
+        } else {
+            ps = cn.prepareStatement("INSERT INTO " + tableName + "(name, cityid) VALUES (?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setString(1, model.getName());
+            ps.setString(2, model.getCity());
+        }
+        ResultSet rs = ps.getGeneratedKeys();
+        ps.executeUpdate();
         if (rs.next()) {
             model.setId(rs.getInt(1));
         }
@@ -170,9 +189,17 @@ public class PsqlStore implements Store {
     private void update(Model model) throws SQLException {
         final String tableName = model.getClass().getSimpleName().toLowerCase();
         Connection cn = pool.getConnection();
-        PreparedStatement ps = cn.prepareStatement("UPDATE " + tableName + " SET name=? WHERE id=?");
-        ps.setString(1, model.getName());
-        ps.setInt(2, model.getId());
+        PreparedStatement ps = null;
+        if (model.getCity() == null) {
+            ps = cn.prepareStatement("UPDATE " + tableName + " SET name=? WHERE id=?");
+            ps.setString(1, model.getName());
+            ps.setInt(2, model.getId());
+        } else {
+            ps = cn.prepareStatement("UPDATE " + tableName + " SET name=?, cityid=? WHERE id=?");
+            ps.setString(1, model.getName());
+            ps.setString(2, model.getCity());
+            ps.setInt(3, model.getId());
+        }
         ps.execute();
         cn.close();
         ps.close();
@@ -199,7 +226,7 @@ public class PsqlStore implements Store {
 
     @Override
     public Candidate findCandidateById(int id) throws SQLException {
-        Candidate result = new Candidate(0, "", "TestPhoto");
+        Candidate result = new Candidate(0, "", "TestPhoto", "");
         Connection cn = pool.getConnection();
         PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate LEFT JOIN photo ON candidate.id=photo.id where candidate.id=?");
         ps.setInt(1, id);
@@ -237,4 +264,5 @@ public class PsqlStore implements Store {
         cn.close();
         ps.close();
     }
+
 }

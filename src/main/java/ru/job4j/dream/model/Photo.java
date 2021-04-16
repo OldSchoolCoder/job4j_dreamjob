@@ -29,6 +29,11 @@ public class Photo implements Model {
     }
 
     @Override
+    public String getCity() {
+        return null;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

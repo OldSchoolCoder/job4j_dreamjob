@@ -24,6 +24,11 @@ public class User implements Model{
         this.name = name;
     }
 
+    @Override
+    public String getCity() {
+        return null;
+    }
+
     public String getEmail() {
         return email;
     }

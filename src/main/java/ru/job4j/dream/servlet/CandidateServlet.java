@@ -40,6 +40,7 @@ public class CandidateServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String name = null;
         String photo = null;
+        String city = null;
         int id = 0;
         DiskFileItemFactory factory = new DiskFileItemFactory();
         ServletContext servletContext = this.getServletConfig().getServletContext();
@@ -64,6 +65,9 @@ public class CandidateServlet extends HttpServlet {
                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                     outputStream.write(item.get());
                     String itemValue = outputStream.toString();
+                    if (item.getFieldName().equals("city")) {
+                        city = itemValue;
+                    }
                     if (item.getFieldName().equals("name")) {
                         name = itemValue;
                     }
@@ -77,7 +81,7 @@ public class CandidateServlet extends HttpServlet {
         }
         Candidate tempCandidate = null;
         if (photo != null && name != null) {
-            tempCandidate = new Candidate(id, name, photo);
+            tempCandidate = new Candidate(id, name, photo, city);
             try {
                 PsqlStore.instOf().save(tempCandidate);
             } catch (SQLException e) {

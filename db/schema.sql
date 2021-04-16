@@ -7,7 +7,8 @@ CREATE TABLE post
 CREATE TABLE candidate
 (
     id   SERIAL PRIMARY KEY,
-    name TEXT
+    name TEXT,
+    cityid TEXT
 );
 
 CREATE TABLE photo
@@ -22,4 +23,10 @@ CREATE TABLE    job_user
     name     TEXT,
     email    TEXT,
     password TEXT
+);
+
+CREATE TABLE city_id
+(
+    id   SERIAL PRIMARY KEY,
+    city TEXT
 );

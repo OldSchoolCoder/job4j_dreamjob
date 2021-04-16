@@ -20,6 +20,23 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
             integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
             crossorigin="anonymous"></script>
+    <script>
+        function validate() {
+            let counter = 0;
+            $('form').find('input').each(function () {
+                if ($(this).val() == '') {
+                    alert('Enter ' + $(this).attr('id'));
+                    return false;
+                } else {
+                    counter++;
+                }
+            });
+            if (counter == 3) {
+                $("form").submit();
+            }
+            return false;
+        }
+    </script>
     <title>Регистрация</title>
 </head>
 
@@ -71,19 +88,21 @@
             <form action="/dreamjob/reg.do" method="post">
                 <div class="input-group mb-3 fw-light">
                     <span class="input-group-text fw-light" id="basic-addon1">@</span>
-                    <input type="text" class="form-control fw-light" name="username" placeholder="Username"
+                    <input type="text" class="form-control fw-light" name="username" id="username"
+                           placeholder="Username"
                            aria-label="Username"
                            aria-describedby="basic-addon1">
                 </div>
                 <div class="mb-3">
                     <label>Почта</label>
-                    <input type="text" class="form-control" name="email">
+                    <input type="text" class="form-control" name="email" id="email">
                 </div>
                 <div class="mb-3">
                     <label>Пароль</label>
-                    <input type="text" class="form-control" name="password">
+                    <input type="text" class="form-control" name="password" id="password">
                 </div>
-                <button type="submit" class="btn btn-warning fw-light">Зарегистрироваться</button>
+                <button type="submit" onclick="return validate()" class="btn btn-warning fw-light">Зарегистрироваться
+                </button>
             </form>
         </div>
     </div>

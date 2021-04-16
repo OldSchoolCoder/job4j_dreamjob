@@ -8,4 +8,6 @@ public interface Model {
     String getName();
 
     void setName(String name);
+
+    String getCity();
 }

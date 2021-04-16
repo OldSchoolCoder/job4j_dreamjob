@@ -5,8 +5,6 @@ import java.util.Objects;
 public class Post implements Model {
     private int id;
     private String name;
-    private String description;
-    private String created;
 
     public Post(int id, String name) {
         this.id = id;
@@ -27,6 +25,11 @@ public class Post implements Model {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String getCity() {
+        return null;
     }
 
     @Override

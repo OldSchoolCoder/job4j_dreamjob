@@ -19,6 +19,11 @@ public class PsqlStoreStub implements Store {
     private final Map<Integer, Post> posts = new ConcurrentHashMap<>();
 
     @Override
+    public Collection<String> getCityList() throws SQLException {
+        return null;
+    }
+
+    @Override
     public Collection<Post> findAllPosts() throws SQLException {
         return new ArrayList<Post>(posts.values());
     }
